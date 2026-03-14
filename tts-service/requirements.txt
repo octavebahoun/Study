@@ -1,0 +1,4 @@
+flask
+gtts
+gunicorn
+markupsafe

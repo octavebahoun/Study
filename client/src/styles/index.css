@@ -1,0 +1,202 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --primary: #3F51B5;
+    --primary-light: #E8EAF6;
+    --secondary: #E8EAF6;
+    --accent: #FF4081;
+    --bg: #F5F7FA;
+    --surface: #FFFFFF;
+    --text: #1a1a2e;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --radius: 12px;
+  }
+
+  [data-theme="nature"] {
+    --primary: #2D6A4F;
+    --primary-light: #d8f3dc;
+    --secondary: #95D5B2;
+    --accent: #D4A373;
+    --bg: #F8F9F1;
+    --surface: #FFFFFF;
+    --text: #1a2e1f;
+    --border: #b7e4c7;
+  }
+
+  [data-theme="energy"] {
+    --primary: #F77F00;
+    --primary-light: #fff3e0;
+    --secondary: #003049;
+    --accent: #FCBF49;
+    --bg: #FFFFFF;
+    --surface: #FFFDF9;
+    --text: #003049;
+    --border: #fed7aa;
+  }
+
+  [data-theme="dark"] {
+    --primary: #BB86FC;
+    --primary-light: #1e1e2e;
+    --secondary: #03DAC6;
+    --accent: #CF6679;
+    --bg: #121212;
+    --surface: #1e1e1e;
+    --text: #e2e2e2;
+    --text-muted: #9ca3af;
+    --border: #2d2d2d;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100dvh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: 'Syne', sans-serif;
+  }
+
+  code,
+  pre {
+    font-family: 'JetBrains Mono', monospace;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2.5 rounded-xl font-semibold text-white transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+    background-color: var(--primary);
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2.5 rounded-xl font-semibold transition-all duration-200 hover:opacity-80 active:scale-95;
+    background-color: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .btn-ghost {
+    @apply px-4 py-2.5 rounded-xl font-medium transition-all duration-200 hover:bg-gray-100 active:scale-95;
+    color: var(--text-muted);
+  }
+
+  .card {
+    @apply rounded-2xl p-4 shadow-sm transition-all duration-200;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+  }
+
+  .card-hover {
+    @apply card hover:shadow-md hover:-translate-y-0.5;
+  }
+
+  .input {
+    @apply w-full rounded-xl px-4 py-2.5 text-sm outline-none transition-all duration-200 placeholder:text-gray-400;
+    background-color: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+  }
+
+  .input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+  }
+
+  .label {
+    @apply text-xs font-semibold uppercase tracking-wider mb-1.5 block;
+    color: var(--text-muted);
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .badge-success {
+    @apply badge bg-green-100 text-green-700;
+  }
+
+  .badge-warning {
+    @apply badge bg-amber-100 text-amber-700;
+  }
+
+  .badge-danger {
+    @apply badge bg-red-100 text-red-700;
+  }
+
+  .badge-info {
+    @apply badge;
+    background-color: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .progress-bar {
+    @apply h-2 rounded-full overflow-hidden;
+    background-color: var(--primary-light);
+  }
+
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-500;
+    background-color: var(--primary);
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-1 py-2 px-3 rounded-xl transition-all duration-200 text-xs font-medium cursor-pointer;
+    color: var(--text-muted);
+  }
+
+  .nav-item.active {
+    background-color: var(--primary-light);
+    color: var(--primary);
+  }
+
+  .section-title {
+    @apply text-xl font-bold mb-4;
+    font-family: 'Syne', sans-serif;
+    color: var(--text);
+  }
+
+
+  .skeleton {
+    @apply animate-pulse rounded-xl;
+    background-color: var(--border);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+/* iOS safe area */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
