@@ -442,7 +442,4 @@ router.post('/revision/podcast', auth, async (req, res) => {
   }
 });
 
-// Remove proxy as we use direct API
-// (Route /tts removed)
-
 module.exports = router;
