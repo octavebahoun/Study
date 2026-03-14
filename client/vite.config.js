@@ -8,11 +8,12 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      injectRegister: 'auto',
+      includeAssets: ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'masked-icon.svg', 'screenshot.png'],
       manifest: {
-        name: 'StudyNotes',
+        name: 'StudyNotes - Carnet de Notes IA',
         short_name: 'StudyNotes',
-        description: 'Carnet de notes intelligent pour étudiants',
+        description: 'Ton compagnon d\'études intelligent avec IA et mode hors-ligne.',
         theme_color: '#3F51B5',
         background_color: '#F5F7FA',
         display: 'standalone',
@@ -22,23 +23,41 @@ export default defineConfig({
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
+          { src: 'masked-icon.svg', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: 'apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
+        ],
+        screenshots: [
+          {
+            src: 'screenshot.png',
+            sizes: '1024x1024',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Dashboard StudyNotes'
+          },
+          {
+            src: 'screenshot.png',
+            sizes: '1024x1024',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'Dashboard StudyNotes'
+          }
         ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,jpg,jpeg}'],
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
             handler: 'CacheFirst',
-            options: { cacheName: 'google-fonts-cache', expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 } }
+            options: { cacheName: 'google-fonts-cache', expiration: { maxEntries: 30, maxAgeSeconds: 60 * 60 * 24 * 365 } }
           },
           {
             urlPattern: /^\/api\/.*/i,
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'api-cache',
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 7 }, // 7 days
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 }, // 30 days for offline reliability
               cacheableResponse: { statuses: [0, 200] }
             }
           }
