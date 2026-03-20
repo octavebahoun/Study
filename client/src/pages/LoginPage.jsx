@@ -20,7 +20,11 @@ export default function LoginPage() {
       setAuth(res.data.user, res.data.token);
       navigate(res.data.user.onboardingCompleted ? "/" : "/onboarding");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Erreur de connexion");
+      const errorMessage =
+        typeof err.response?.data?.error === "string"
+          ? err.response.data.error
+          : err.message || "Erreur de connexion";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -49,7 +53,7 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <div className="card p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="card p-6 space-y-4">
           <h2 className="text-xl font-bold mb-2">Connexion</h2>
 
           <div>
@@ -99,13 +103,13 @@ export default function LoginPage() {
           </div>
 
           <button
-            onClick={handleSubmit}
+            type="submit"
             disabled={loading}
             className="btn-primary w-full mt-2"
           >
             {loading ? "Connexion..." : "Se connecter"}
           </button>
-        </div>
+        </form>
 
         <p
           className="text-center text-sm mt-4"

@@ -21,7 +21,11 @@ export default function RegisterPage() {
       setAuth(res.data.user, res.data.token);
       navigate("/onboarding");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Erreur inscription");
+      const errorMessage =
+        typeof err.response?.data?.error === "string"
+          ? err.response.data.error
+          : err.message || "Erreur inscription";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -46,7 +50,7 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <div className="card p-5 space-y-3">
+        <form onSubmit={handleSubmit} className="card p-5 space-y-3">
           <h2 className="text-lg font-bold mb-1">Inscription</h2>
 
           <div>
@@ -63,6 +67,7 @@ export default function RegisterPage() {
                 placeholder="Ton nom"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+                required
               />
             </div>
           </div>
@@ -106,13 +111,13 @@ export default function RegisterPage() {
           </div>
 
           <button
-            onClick={handleSubmit}
+            type="submit"
             disabled={loading}
             className="btn-primary w-full mt-2"
           >
             {loading ? "Création..." : "Créer mon compte"}
           </button>
-        </div>
+        </form>
 
         <p
           className="text-center text-sm mt-4"

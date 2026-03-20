@@ -67,7 +67,7 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/api': { target: 'http://localhost:5000', changeOrigin: true }
+      '/api': { target: 'https://study-otg4.onrender.com', changeOrigin: true }
     }
   }
 });
