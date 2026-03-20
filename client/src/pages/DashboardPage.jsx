@@ -95,15 +95,15 @@ export default function DashboardPage() {
   return (
     <div>
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
         <div>
           <p
-            className="text-sm font-bold uppercase tracking-widest mb-1"
+            className="text-[10px] font-bold uppercase tracking-widest mb-0.5"
             style={{ color: "var(--primary)" }}
           >
             {format(new Date(), "EEEE d MMMM", { locale: fr })}
           </p>
-          <h1 className="text-3xl md:text-4xl">
+          <h1 className="text-2xl md:text-3xl">
             Salut, {user?.name?.split(" ")[0] || "Étudiant"} ! ✨
           </h1>
           {stats?.semName && (
@@ -116,12 +116,12 @@ export default function DashboardPage() {
 
         {/* AI Insight Card */}
         {(aiWord || loadingAI) && (
-          <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl p-4 max-w-sm">
-            <div className="flex gap-3 items-start">
-              <Zap size={18} className="mt-1 shrink-0 text-indigo-500" />
-              <div className="text-sm italic text-indigo-700 dark:text-indigo-300">
+          <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-xl p-3 max-w-sm">
+            <div className="flex gap-2 items-start">
+              <Zap size={16} className="mt-0.5 shrink-0 text-indigo-500" />
+              <div className="text-xs italic text-indigo-700 dark:text-indigo-300">
                 {loadingAI ? (
-                  <span className="skeleton h-4 w-48 inline-block" />
+                  <span className="skeleton h-3 w-40 inline-block" />
                 ) : (
                   aiWord
                 )}
@@ -137,29 +137,29 @@ export default function DashboardPage() {
           {/* Global Average Hero Card */}
           {stats && (
             <div className="card bg-gradient-to-br from-indigo-600 to-violet-700 text-white border-none shadow-indigo-200">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2 bg-white/20 px-3 py-1.5 rounded-xl backdrop-blur-md">
-                  <TrendingUp size={18} />
-                  <span className="font-bold text-sm">Moyenne générale</span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 bg-white/20 px-2.5 py-1 rounded-lg backdrop-blur-md">
+                  <TrendingUp size={16} />
+                  <span className="font-bold text-xs">Moyenne générale</span>
                 </div>
                 <div className="flex items-center gap-2 text-white/80">
-                  <Target size={16} />
-                  <span className="text-sm font-bold">
+                  <Target size={14} />
+                  <span className="text-xs font-bold">
                     Objectif: {stats.globalTarget}/20
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-end gap-3 mb-6">
-                <span className="text-6xl font-black">
+              <div className="flex items-end gap-2 mb-4">
+                <span className="text-4xl font-black">
                   {stats.globalAvg !== null ? stats.globalAvg.toFixed(2) : "--"}
                 </span>
-                <span className="text-2xl font-bold opacity-60 mb-2">/20</span>
+                <span className="text-lg font-bold opacity-60 mb-1">/20</span>
               </div>
 
               {stats.globalAvg !== null && (
-                <div className="space-y-2">
-                  <div className="h-3 bg-white/20 rounded-full overflow-hidden">
+                <div className="space-y-1.5">
+                  <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-white transition-all duration-1000 ease-out"
                       style={{
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                       }}
                     />
                   </div>
-                  <p className="text-xs font-bold text-white/70 text-right">
+                  <p className="text-[10px] font-bold text-white/70 text-right">
                     {Math.round((stats.globalAvg / 20) * 100)}% de progression
                   </p>
                 </div>
@@ -177,27 +177,27 @@ export default function DashboardPage() {
 
           {/* Subject Grid */}
           <div>
-            <div className="flex items-center justify-between mb-4 px-1">
-              <h2 className="text-lg font-bold">Matières suivies</h2>
-              <button className="text-sm font-bold text-indigo-500 flex items-center gap-1">
-                Tout voir <ChevronRight size={14} />
+            <div className="flex items-center justify-between mb-3 px-1">
+              <h2 className="text-base font-bold">Matières suivies</h2>
+              <button className="text-xs font-bold text-indigo-500 flex items-center gap-1">
+                Tout voir <ChevronRight size={12} />
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {stats?.subjectStats.map((subj, i) => (
-                <div key={i} className="card-hover p-5 border-slate-100">
-                  <div className="flex justify-between items-start mb-4">
+                <div key={i} className="card-hover p-3 border-slate-100">
+                  <div className="flex justify-between items-start mb-3">
                     <div className="min-w-0">
-                      <p className="font-bold text-slate-800 dark:text-slate-200 truncate">
+                      <p className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate pr-2">
                         {subj.name.replace(/&amp;/g, "&")}
                       </p>
-                      <p className="text-xs text-slate-400 font-bold mt-0.5">
+                      <p className="text-[10px] text-slate-400 font-bold mt-0.5">
                         Coef. {subj.coefficient}
                       </p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">
+                      <p className="text-lg font-black text-indigo-600 dark:text-indigo-400">
                         {subj.average !== null ? subj.average.toFixed(1) : "—"}
                       </p>
                       <p className="text-[10px] font-bold text-slate-400">
@@ -227,16 +227,16 @@ export default function DashboardPage() {
         <div className="space-y-6">
           {/* Upcoming Controls */}
           <div className="card border-slate-100">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Clock size={18} className="text-amber-500" />À venir
+            <h2 className="text-base font-bold mb-3 flex items-center gap-2">
+              <Clock size={16} className="text-amber-500" />À venir
             </h2>
 
             {stats?.upcoming.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {stats.upcoming.map((ctrl, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
+                    className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800"
                   >
                     <div className="flex justify-between items-center mb-1">
                       <p className="font-bold text-sm truncate pr-2">
@@ -261,8 +261,8 @@ export default function DashboardPage() {
 
           {/* Badges / Motivation */}
           <div className="card border-slate-100">
-            <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Star size={18} className="text-yellow-500" />
+            <h2 className="text-base font-bold mb-3 flex items-center gap-2">
+              <Star size={16} className="text-yellow-500" />
               Badges
             </h2>
             <div className="flex flex-wrap gap-2">

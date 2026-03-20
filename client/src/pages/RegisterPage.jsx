@@ -33,32 +33,32 @@ export default function RegisterPage() {
       style={{ background: "var(--bg)" }}
     >
       <div className="w-full max-w-sm animate-slide-up">
-        <div className="flex flex-col items-center mb-10">
+        <div className="flex flex-col items-center mb-6">
           <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 shadow-lg"
+            className="w-12 h-12 rounded-xl flex items-center justify-center mb-3 shadow-md"
             style={{ background: "var(--primary)" }}
           >
-            <BookOpen size={32} color="white" />
+            <BookOpen size={24} color="white" />
           </div>
-          <h1 className="text-3xl font-bold">StudyNotes</h1>
-          <p className="text-sm mt-1" style={{ color: "var(--text-muted)" }}>
-            Créer ton compte
+          <h1 className="text-2xl font-bold">StudyNotes</h1>
+          <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+            Création de compte
           </p>
         </div>
 
-        <div className="card p-6 space-y-4">
-          <h2 className="text-xl font-bold mb-2">Inscription</h2>
+        <div className="card p-5 space-y-3">
+          <h2 className="text-lg font-bold mb-1">Inscription</h2>
 
           <div>
             <label className="label">Prénom / Nom</label>
             <div className="relative">
               <User
-                size={16}
-                className="absolute left-3 top-3"
+                size={14}
+                className="absolute left-3 top-2.5"
                 style={{ color: "var(--text-muted)" }}
               />
               <input
-                className="input pl-9"
+                className="input pl-8"
                 type="text"
                 placeholder="Ton nom"
                 value={form.name}
@@ -71,12 +71,12 @@ export default function RegisterPage() {
             <label className="label">Email</label>
             <div className="relative">
               <Mail
-                size={16}
-                className="absolute left-3 top-3"
+                size={14}
+                className="absolute left-3 top-2.5"
                 style={{ color: "var(--text-muted)" }}
               />
               <input
-                className="input pl-9"
+                className="input pl-8"
                 type="email"
                 placeholder="ton@email.com"
                 value={form.email}
@@ -90,12 +90,12 @@ export default function RegisterPage() {
             <label className="label">Mot de passe</label>
             <div className="relative">
               <Lock
-                size={16}
-                className="absolute left-3 top-3"
+                size={14}
+                className="absolute left-3 top-2.5"
                 style={{ color: "var(--text-muted)" }}
               />
               <input
-                className="input pl-9"
+                className="input pl-8"
                 type="password"
                 placeholder="6 caractères min"
                 value={form.password}

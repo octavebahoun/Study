@@ -218,7 +218,7 @@ export default function MatieresPage() {
 
       {/* Add Subject Modal/Form */}
       {isAddingSubject && (
-        <div className="card p-5 mb-6 border-indigo-200 dark:border-indigo-800 bg-indigo-50/30 animate-fade-in">
+        <div className="card p-4 mb-5 border-indigo-200 dark:border-indigo-800 bg-indigo-50/30 animate-fade-in">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-bold flex items-center gap-2">
               <Plus size={18} className="text-indigo-600" /> Nouvel objet
@@ -275,9 +275,9 @@ export default function MatieresPage() {
           </div>
           <button
             onClick={handleAddSubject}
-            className="btn-primary w-full mt-5 flex items-center justify-center gap-2"
+            className="btn-primary w-full mt-4 flex items-center justify-center gap-2 py-2 text-sm"
           >
-            <Save size={18} /> Enregistrer la matière
+            <Save size={16} /> Enregistrer la matière
           </button>
         </div>
       )}
@@ -291,22 +291,22 @@ export default function MatieresPage() {
           return (
             <div key={idx} className="card overflow-hidden">
               <div
-                className="w-full p-4 flex items-center justify-between cursor-pointer"
+                className="w-full p-3 flex items-center justify-between cursor-pointer"
                 onClick={() => toggleExpand(idx)}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
                     style={{ background: "var(--primary-light)" }}
                   >
-                    <BookMarked size={18} style={{ color: "var(--primary)" }} />
+                    <BookMarked size={16} style={{ color: "var(--primary)" }} />
                   </div>
                   <div>
-                    <p className="font-bold">
+                    <p className="text-sm font-bold">
                       {subject.name.replace(/&amp;/g, "&")}
                     </p>
                     <p
-                      className="text-xs"
+                      className="text-[10px] leading-tight"
                       style={{ color: "var(--text-muted)" }}
                     >
                       Coeff. {subject.coefficient} · {notionCount} notion
@@ -345,7 +345,7 @@ export default function MatieresPage() {
 
               {/* Edit Form */}
               {editingSubject === idx && (
-                <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 space-y-4 animate-fade-in">
+                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 space-y-3 animate-fade-in">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="label text-[10px]">Nom</label>
@@ -416,7 +416,7 @@ export default function MatieresPage() {
 
               {isExpanded && (
                 <div
-                  className="px-4 pb-4 space-y-3 border-t"
+                  className="px-3 pb-3 space-y-3 border-t"
                   style={{ borderColor: "var(--border)" }}
                 >
                   {/* Notions */}
@@ -427,11 +427,11 @@ export default function MatieresPage() {
                     >
                       Notions étudiées
                     </p>
-                    <div className="flex flex-wrap gap-2 mb-3">
+                    <div className="flex flex-wrap gap-1.5 mb-2.5">
                       {subject.notions?.map((notion, nIdx) => (
                         <span
                           key={nIdx}
-                          className="flex items-center gap-1 px-3 py-1 rounded-full text-sm"
+                          className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px]"
                           style={{
                             background: "var(--primary-light)",
                             color: "var(--primary)",
@@ -442,7 +442,7 @@ export default function MatieresPage() {
                             onClick={() => removeNotion(idx, nIdx)}
                             className="hover:opacity-60"
                           >
-                            <X size={12} />
+                            <X size={10} />
                           </button>
                         </span>
                       ))}
@@ -488,7 +488,7 @@ export default function MatieresPage() {
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-between mb-2">
                       <p
-                        className="text-xs font-medium"
+                        className="text-[10px] font-bold"
                         style={{ color: "var(--text-muted)" }}
                       >
                         Documents (RAG)
@@ -520,7 +520,7 @@ export default function MatieresPage() {
                       {subject.documents?.map((doc) => (
                         <div
                           key={doc._id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800"
+                          className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800"
                         >
                           <div className="flex items-center gap-2 min-w-0">
                             <File
@@ -543,7 +543,7 @@ export default function MatieresPage() {
                   {/* Controls */}
                   <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                     <p
-                      className="text-xs font-medium mb-2"
+                      className="text-[10px] font-bold mb-2"
                       style={{ color: "var(--text-muted)" }}
                     >
                       Contrôles
@@ -552,9 +552,9 @@ export default function MatieresPage() {
                       {subject.controls.map((ctrl, cIdx) => (
                         <div
                           key={cIdx}
-                          className="flex items-center justify-between text-sm"
+                          className="flex items-center justify-between text-xs"
                         >
-                          <span className="font-medium">{ctrl.name}</span>
+                          <span className="font-bold">{ctrl.name}</span>
                           <div className="flex items-center gap-2">
                             {ctrl.date && (
                               <span style={{ color: "var(--text-muted)" }}>
@@ -564,7 +564,7 @@ export default function MatieresPage() {
                               </span>
                             )}
                             <span
-                              className={`badge ${ctrl.score !== null ? "badge-success" : "badge-warning"}`}
+                              className={`badge scale-90 ${ctrl.score !== null ? "badge-success" : "badge-warning"}`}
                             >
                               {ctrl.score !== null
                                 ? `${ctrl.score}/20`

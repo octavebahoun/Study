@@ -152,7 +152,7 @@ export default function OnboardingPage() {
           {STEPS.map((s, i) => (
             <div key={i} className="flex items-center">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
                 ${i <= step ? "text-white" : "text-gray-400"}`}
                 style={{
                   background: i <= step ? "var(--primary)" : "var(--border)",
@@ -162,7 +162,7 @@ export default function OnboardingPage() {
               </div>
               {i < STEPS.length - 1 && (
                 <div
-                  className="w-8 h-0.5 mx-1"
+                  className="w-6 h-0.5 mx-1"
                   style={{
                     background: i < step ? "var(--primary)" : "var(--border)",
                   }}
@@ -174,15 +174,15 @@ export default function OnboardingPage() {
 
         {/* Step 0: Welcome */}
         {step === 0 && (
-          <div className="animate-slide-up text-center space-y-6">
+          <div className="animate-slide-up text-center space-y-4">
             <div
-              className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto shadow-xl"
+              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto shadow-lg"
               style={{ background: "var(--primary)" }}
             >
-              <BookOpen size={40} color="white" />
+              <BookOpen size={28} color="white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-2">
+              <h1 className="text-2xl font-bold mb-1.5">
                 Bienvenue {user?.name || ""} ! 👋
               </h1>
               <p style={{ color: "var(--text-muted)" }}>
@@ -190,14 +190,14 @@ export default function OnboardingPage() {
                 personnalisé de tes notes.
               </p>
             </div>
-            <div className="card p-4 text-left">
-              <p className="text-sm font-medium mb-2">Tu vas :</p>
+            <div className="card p-3.5 text-left">
+              <p className="text-xs font-bold mb-1.5">Tu vas :</p>
               <ul
-                className="text-sm space-y-1.5"
+                className="text-xs space-y-1"
                 style={{ color: "var(--text-muted)" }}
               >
-                <li>• Définir le nombre de semestres de ta formation</li>
-                <li>• Ajouter tes matières avec leur formule de calcul</li>
+                <li>• Définir le nombre de semestres</li>
+                <li>• Ajouter tes matières et formules</li>
                 <li>• Fixer tes objectifs de moyenne</li>
               </ul>
             </div>
@@ -209,7 +209,7 @@ export default function OnboardingPage() {
           <div className="animate-slide-up space-y-4">
             <h2 className="section-title">Configuration des semestres</h2>
 
-            <div className="card p-4 space-y-4">
+            <div className="card p-3 space-y-3">
               <div>
                 <label className="label">Nombre total de semestres</label>
                 <input
@@ -249,7 +249,7 @@ export default function OnboardingPage() {
               {config.semesters.map((sem, idx) => (
                 <div
                   key={idx}
-                  className="border rounded-xl p-3"
+                  className="border rounded-lg p-2.5"
                   style={{ borderColor: "var(--border)" }}
                 >
                   <div className="flex gap-2">
@@ -268,7 +268,7 @@ export default function OnboardingPage() {
                       min={0}
                       max={20}
                       step={0.5}
-                      className="input w-24"
+                      className="input w-20"
                       placeholder="Obj."
                       value={sem.targetAverage}
                       onChange={(e) => {
@@ -290,22 +290,21 @@ export default function OnboardingPage() {
             <h2 className="section-title">Matières par semestre</h2>
 
             <div
-              className="card p-3 flex gap-2 text-xs"
+              className="card p-2.5 flex gap-2 text-[10px]"
               style={{ color: "var(--text-muted)" }}
             >
-              <Info size={14} className="mt-0.5 shrink-0" />
+              <Info size={12} className="mt-0.5 shrink-0" />
               <span>
                 Formule ex:{" "}
                 <code className="font-mono bg-gray-100 px-1 rounded">
                   (i1+i2)*0.4 + (0.6*d1)
                 </code>{" "}
-                — les variables (i1, i2, d1) deviennent automatiquement tes
-                contrôles.
+                — les variables deviennent tes contrôles.
               </span>
             </div>
 
             {config.semesters.map((sem, semIdx) => (
-              <div key={semIdx} className="card p-4 space-y-3">
+              <div key={semIdx} className="card p-3 space-y-2.5">
                 <h3
                   className="font-bold text-sm"
                   style={{ color: "var(--primary)" }}
@@ -366,10 +365,10 @@ export default function OnboardingPage() {
                     {subj.controls.length > 0 && (
                       <div className="space-y-2">
                         <p
-                          className="text-xs font-medium"
+                          className="text-[10px] font-bold"
                           style={{ color: "var(--text-muted)" }}
                         >
-                          Contrôles détectés — date optionnelle :
+                          Contrôles détectés :
                         </p>
                         {subj.controls.map((ctrl, ctrlIdx) => (
                           <div
@@ -460,22 +459,22 @@ export default function OnboardingPage() {
 
         {/* Step 3: Done */}
         {step === 3 && (
-          <div className="animate-slide-up text-center space-y-6">
-            <div className="text-6xl">🎉</div>
-            <h2 className="text-2xl font-bold">Tout est prêt !</h2>
-            <p style={{ color: "var(--text-muted)" }}>
+          <div className="animate-slide-up text-center space-y-4">
+            <div className="text-5xl">🎉</div>
+            <h2 className="text-xl font-bold">Tout est prêt !</h2>
+            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
               {config.semesters.reduce(
                 (acc, s) => acc + s.subjects.filter((sub) => sub.name).length,
                 0,
               )}{" "}
-              matière(s) configurée(s) sur {config.totalSemesters} semestre(s).
+              matière(s) configurée(s).
             </p>
             <button
               onClick={handleFinish}
               disabled={loading}
-              className="btn-primary px-8 py-3 text-base"
+              className="btn-primary px-6 py-2 text-sm"
             >
-              {loading ? "Finalisation..." : "Commencer StudyNotes →"}
+              {loading ? "Finalisation..." : "Commencer →"}
             </button>
           </div>
         )}
@@ -485,16 +484,16 @@ export default function OnboardingPage() {
           <button
             onClick={() => setStep((s) => s - 1)}
             disabled={step === 0}
-            className="btn-ghost flex items-center gap-2 disabled:invisible"
+            className="btn-ghost py-1 px-3 text-xs flex items-center gap-2 disabled:invisible"
           >
-            <ChevronLeft size={18} /> Retour
+            <ChevronLeft size={16} /> Retour
           </button>
           {step < 3 ? (
             <button
               onClick={() => setStep((s) => s + 1)}
-              className="btn-primary flex items-center gap-2"
+              className="btn-primary py-1 px-3 text-xs flex items-center gap-2"
             >
-              Suivant <ChevronRight size={18} />
+              Suivant <ChevronRight size={16} />
             </button>
           ) : null}
         </div>

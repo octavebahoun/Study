@@ -182,7 +182,7 @@ export default function NotesPage() {
           <div key={subIdx} className="card mb-4 overflow-hidden">
             {/* Header */}
             <div
-              className="p-4 pb-3 flex items-start justify-between"
+              className="p-3 pb-2 flex items-start justify-between"
               style={{ borderBottom: `1px solid var(--border)` }}
             >
               <div>
@@ -198,7 +198,7 @@ export default function NotesPage() {
               </div>
               <div className="text-right">
                 <p
-                  className="text-2xl font-bold"
+                  className="text-xl font-bold"
                   style={{
                     color:
                       avg !== null
@@ -218,7 +218,7 @@ export default function NotesPage() {
 
             {/* Progress */}
             {avg !== null && (
-              <div className="px-4 py-2">
+              <div className="px-3 py-1.5">
                 <div className="progress-bar">
                   <div
                     className="progress-fill"
@@ -232,7 +232,7 @@ export default function NotesPage() {
             )}
 
             {/* Controls */}
-            <div className="p-4 pt-2 space-y-2">
+            <div className="p-3 pt-1.5 space-y-2">
               {subject.controls.map((ctrl, ctrlIdx) => (
                 <div key={ctrlIdx} className="flex items-center gap-3">
                   <div className="flex-1">
@@ -252,7 +252,7 @@ export default function NotesPage() {
                       min={0}
                       max={20}
                       step={0.5}
-                      className="input w-20 text-center text-lg font-bold"
+                      className="input w-16 py-1 text-center text-base font-bold"
                       placeholder="—"
                       defaultValue={ctrl.score ?? ""}
                       onBlur={(e) => {
@@ -284,9 +284,9 @@ export default function NotesPage() {
 
             {/* Required next */}
             {Object.keys(req.requiredScores).length > 0 && (
-              <div className="px-4 pb-3">
+              <div className="px-3 pb-2.5">
                 <div
-                  className="rounded-xl px-3 py-2 text-sm"
+                  className="rounded-lg px-2.5 py-1.5 text-[11px]"
                   style={{
                     background: req.isPossible
                       ? "var(--primary-light)"
@@ -304,9 +304,9 @@ export default function NotesPage() {
 
             {/* AI Feedback */}
             {(aiFeedbacks[key] || loadingFeedback[key]) && (
-              <div className="px-4 pb-4">
+              <div className="px-3 pb-3">
                 <div
-                  className="rounded-xl p-3 flex gap-2"
+                  className="rounded-lg p-2.5 flex gap-2"
                   style={{ background: "var(--primary-light)" }}
                 >
                   <Sparkles
