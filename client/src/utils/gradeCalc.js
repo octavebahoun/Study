@@ -1,42 +1,91 @@
 /**
- * Logique de calcul simplifiée :
- * Moyenne = (Moyenne des Interros + Moyenne des Devoirs) / 2
- * Si un groupe est totalement vide, on prend l'autre groupe à 100%.
+ * Calcule la moyenne d'un ensemble de notes selon une formule personnalisée.
  */
 
 /**
- * Calcule la moyenne d'un ensemble de notes
- */
-function calculateGroupAverage(scores, prefix) {
-  const groupScores = Object.keys(scores)
-    .filter(key => key.toLowerCase().startsWith(prefix.toLowerCase()))
-    .map(key => Number(scores[key]))
-    .filter(val => !isNaN(val));
-
-  if (groupScores.length === 0) return null;
-  const sum = groupScores.reduce((a, b) => a + b, 0);
-  return sum / groupScores.length;
-}
-
-/**
- * Évalue la moyenne globale selon la règle : (Avg(Interros) + Avg(Devoirs)) / 2
- */
-export function evaluateFormula(formula, scores) {
-  const avgI = calculateGroupAverage(scores, 'i');
-  const avgD = calculateGroupAverage(scores, 'd');
-
-  if (avgI !== null && avgD !== null) return (avgI + avgD) / 2;
-  if (avgI !== null) return avgI;
-  if (avgD !== null) return avgD;
-  return null;
-}
-
-/**
- * Extrait les variables (i1, d1, etc.)
+ * Extrait les variables uniques (ex: i1, d2) d'une formule.
  */
 export function extractVariables(formula) {
-  // Dans la version simplifiée, on ne regarde plus la formule mais les préfixes standard
-  return ['i', 'd'];
+  if (!formula || typeof formula !== "string") return [];
+  const matches = formula.match(/[a-zA-Z][a-zA-Z0-9]*/g) || [];
+  const excludeList = new Set(["min", "max", "avg", "sin", "cos", "tan", "sqrt", "abs", "pow"]);
+  const uniqueVars = Array.from(
+    new Set(
+      matches
+        .map((m) => m.toLowerCase())
+        .filter((m) => !excludeList.has(m))
+    )
+  );
+  return uniqueVars;
+}
+
+/**
+ * Évalue la moyenne globale selon la règle : (Somme des notes réelles / Somme des notes possibles) * 20
+ * pour s'assurer que la moyenne s'adapte dynamiquement au nombre de notes saisies.
+ */
+export function evaluateFormula(formula, scores) {
+  if (!formula || typeof formula !== "string" || formula.trim() === "") {
+    // Repli : moyenne simple de toutes les notes existantes
+    const vals = Object.values(scores)
+      .map(Number)
+      .filter((v) => !isNaN(v));
+    if (vals.length === 0) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
+
+  const vars = extractVariables(formula);
+  if (vars.length === 0) return null;
+
+  // Filtrer les variables qui ont effectivement une note
+  const filledVars = vars.filter(
+    (v) => scores[v] !== undefined && scores[v] !== null && scores[v] !== ""
+  );
+  if (filledVars.length === 0) return null;
+
+  // Fonction interne d'évaluation sécurisée d'une expression mathématique simple
+  const safeEval = (expr) => {
+    try {
+      // N'autorise que les chiffres, opérateurs mathématiques de base, parenthèses et espaces
+      const cleanExpr = expr.replace(/[^0-9+\-*/().\s]/g, "");
+      const fn = new Function(`return (${cleanExpr});`);
+      const val = fn();
+      return typeof val === "number" && !isNaN(val) && isFinite(val) ? val : null;
+    } catch {
+      return null;
+    }
+  };
+
+  // 1. Évaluation avec les notes réelles (0 pour les notes manquantes)
+  let actualExpr = formula;
+  vars.forEach((v) => {
+    const val =
+      scores[v] !== undefined && scores[v] !== null && scores[v] !== ""
+        ? Number(scores[v])
+        : 0;
+    actualExpr = actualExpr.replace(new RegExp(`\\b${v}\\b`, "gi"), val);
+  });
+  const actualVal = safeEval(actualExpr);
+
+  // 2. Évaluation avec 20 pour les notes réelles (0 pour les notes manquantes)
+  // pour mesurer la pondération totale des contrôles actuellement saisis
+  let maxExpr = formula;
+  vars.forEach((v) => {
+    const val =
+      scores[v] !== undefined && scores[v] !== null && scores[v] !== ""
+        ? 20
+        : 0;
+    maxExpr = maxExpr.replace(new RegExp(`\\b${v}\\b`, "gi"), val);
+  });
+  const maxVal = safeEval(maxExpr);
+
+  if (actualVal === null || maxVal === null || maxVal === 0) {
+    // En cas d'erreur ou si la pondération actuelle est nulle, repli sur la moyenne arithmétique simple
+    const vals = filledVars.map((v) => Number(scores[v])).filter((v) => !isNaN(v));
+    if (vals.length === 0) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
+
+  return (actualVal / maxVal) * 20;
 }
 
 /**
@@ -45,45 +94,23 @@ export function extractVariables(formula) {
 export function calculateRequired(formula, filledScores, allVars, target) {
   const targetNum = Number(target) || 10;
 
-  // Dans cette version, on cherche la note 'x' à avoir dans TOUS les contrôles restants
-  // pour que la moyenne pondérée atteigne 'targetNum'
-
-  let low = 0, high = 20;
-
-  // On vérifie d'abord si c'est possible avec 20
-  const testMax = { ...filledScores };
-  // On identifie quels types de contrôles sont présents mais non remplis
-  // Note: On utilise allVars qui contient ici les préfixes 'i' et 'd'
-
-  // Pour la recherche binaire, on va injecter la même note 'mid' dans tous les slots vides
-  // Mais on a besoin de savoir quels slots sont vides.
-  // On va utiliser un mapping simplifié.
+  // On recherche par dichotomie la note 'x' à obtenir dans tous les contrôles restants
+  // pour atteindre l'objectif targetNum.
+  let low = 0,
+    high = 20;
 
   for (let i = 0; i < 25; i++) {
     const mid = (low + high) / 2;
 
-    // On construit un set de scores virtuels : notes existantes + 'mid' pour les trous
-    // On doit savoir quels iX et dX existent. On va regarder filledScores.
-    // En fait, on a besoin de la liste des contrôles de la matière.
-    // Alternative: Simuler le calcul via une fonction locale qui connaît la structure
-
-    // Pour simplifier ici, on va utiliser evaluateFormula en passant 'mid' là où il manque des données.
-    // Cependant evaluateFormula ne sait pas combien de 'i' manquent.
-    // Donc on va passer une version modifiée de filledScores.
-
-    // Attends, la fonction est appelée avec 'allVars'. Dans le nouveau système, 
-    // allVars devrait être les IDs des contrôles manquants.
-
     const testScores = { ...filledScores };
-    allVars.forEach(v => {
-      if (testScores[v] === undefined || testScores[v] === null) {
+    allVars.forEach((v) => {
+      if (testScores[v] === undefined || testScores[v] === null || testScores[v] === "") {
         testScores[v] = mid;
       }
     });
 
-    const result = evaluateFormula("", testScores);
+    const result = evaluateFormula(formula, testScores);
     if (result === null) {
-      // Si rien n'est rempli, la moyenne est 'mid'
       if (mid < targetNum) low = mid;
       else high = mid;
     } else {
@@ -92,32 +119,30 @@ export function calculateRequired(formula, filledScores, allVars, target) {
     }
   }
 
-  // On arrondit proprement à 1 chiffre après la virgule
-  // Pour éviter le 18.1 au lieu de 18.0, on utilise un arrondi classique à 0.1 près
   const required = Math.round(high * 10) / 10;
   const res = {};
-  allVars.forEach(v => {
-    if (filledScores[v] === undefined || filledScores[v] === null) {
+  allVars.forEach((v) => {
+    if (filledScores[v] === undefined || filledScores[v] === null || filledScores[v] === "") {
       res[v] = required;
     }
   });
 
   return {
     requiredScores: res,
-    isPossible: required <= 20
+    isPossible: required <= 20,
   };
 }
 
 /**
- * Analyse la moyenne d'un sujet
+ * Analyse la moyenne d'un sujet (matière)
  */
 export function getSubjectAverage(subject) {
   const scores = {};
   let allFilled = true;
   let filledCount = 0;
 
-  subject.controls.forEach(ctrl => {
-    if (ctrl.score !== null && ctrl.score !== undefined) {
+  subject.controls.forEach((ctrl) => {
+    if (ctrl.score !== null && ctrl.score !== undefined && ctrl.score !== "") {
       scores[ctrl.variable] = ctrl.score;
       filledCount++;
     } else {
@@ -125,6 +150,6 @@ export function getSubjectAverage(subject) {
     }
   });
 
-  const avg = evaluateFormula("", scores);
+  const avg = evaluateFormula(subject.formula, scores);
   return { average: avg, allFilled, filledCount };
 }

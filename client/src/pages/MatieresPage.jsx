@@ -17,6 +17,7 @@ import useStore from "../store/useStore";
 import api from "../utils/api";
 import toast from "react-hot-toast";
 import { checkAndToastNewBadges } from "../utils/badgeSync";
+import { extractVariables } from "../utils/gradeCalc";
 
 export default function MatieresPage() {
   const { semesters, user, updateSemester, updateUser } = useStore();
@@ -56,9 +57,17 @@ export default function MatieresPage() {
     }
 
     try {
+      const vars = extractVariables(subjectForm.formula);
+      const newControls = vars.map((v) => ({
+        name: v.toUpperCase(),
+        variable: v,
+        date: null,
+        score: null,
+      }));
+
       const newSubjects = [
         ...semester.subjects,
-        { ...subjectForm, notions: [], controls: [] },
+        { ...subjectForm, notions: [], controls: newControls },
       ];
       const res = await api.put(`/semesters/${semester._id}`, {
         subjects: newSubjects,
@@ -81,7 +90,41 @@ export default function MatieresPage() {
   const handleUpdateSubject = async (index) => {
     try {
       const newSubjects = [...semester.subjects];
-      newSubjects[index] = { ...newSubjects[index], ...subjectForm };
+      const oldSubject = newSubjects[index];
+      const vars = extractVariables(subjectForm.formula);
+
+      const existingMap = new Map();
+      if (Array.isArray(oldSubject.controls)) {
+        oldSubject.controls.forEach((ctrl) => {
+          if (ctrl && ctrl.variable) {
+            existingMap.set(ctrl.variable.toLowerCase(), ctrl);
+          }
+        });
+      }
+
+      const updatedControls = vars.map((v) => {
+        const existing = existingMap.get(v.toLowerCase());
+        if (existing) {
+          return {
+            ...existing,
+            variable: v,
+          };
+        } else {
+          return {
+            name: v.toUpperCase(),
+            variable: v,
+            date: null,
+            score: null,
+          };
+        }
+      });
+
+      newSubjects[index] = {
+        ...oldSubject,
+        ...subjectForm,
+        controls: updatedControls,
+      };
+
       const res = await api.put(`/semesters/${semester._id}`, {
         subjects: newSubjects,
       });

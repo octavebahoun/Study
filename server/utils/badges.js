@@ -35,30 +35,80 @@ const BADGES_DEF = {
 };
 
 /**
- * Calcule la moyenne d'un ensemble de notes pour un préfixe donné (i ou d)
+ * Extrait les variables uniques (ex: i1, d2) d'une formule.
  */
-function calculateGroupAverage(scores, prefix) {
-  const groupScores = Object.keys(scores)
-    .filter(key => key.toLowerCase().startsWith(prefix.toLowerCase()))
-    .map(key => Number(scores[key]))
-    .filter(val => !isNaN(val));
-
-  if (groupScores.length === 0) return null;
-  const sum = groupScores.reduce((a, b) => a + b, 0);
-  return sum / groupScores.length;
+function extractVariables(formula) {
+  if (!formula || typeof formula !== "string") return [];
+  const matches = formula.match(/[a-zA-Z][a-zA-Z0-9]*/g) || [];
+  const excludeList = new Set(["min", "max", "avg", "sin", "cos", "tan", "sqrt", "abs", "pow"]);
+  const uniqueVars = Array.from(
+    new Set(
+      matches
+        .map((m) => m.toLowerCase())
+        .filter((m) => !excludeList.has(m))
+    )
+  );
+  return uniqueVars;
 }
 
 /**
- * Évalue la moyenne globale selon la règle : (Avg(Interros) + Avg(Devoirs)) / 2
+ * Évalue la moyenne globale selon la règle : (Somme des notes réelles / Somme des notes possibles) * 20
  */
-function evaluateFormula(scores) {
-  const avgI = calculateGroupAverage(scores, 'i');
-  const avgD = calculateGroupAverage(scores, 'd');
+function evaluateFormula(formula, scores) {
+  if (!formula || typeof formula !== "string" || formula.trim() === "") {
+    const vals = Object.values(scores)
+      .map(Number)
+      .filter((v) => !isNaN(v));
+    if (vals.length === 0) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
 
-  if (avgI !== null && avgD !== null) return (avgI + avgD) / 2;
-  if (avgI !== null) return avgI;
-  if (avgD !== null) return avgD;
-  return null;
+  const vars = extractVariables(formula);
+  if (vars.length === 0) return null;
+
+  const filledVars = vars.filter(
+    (v) => scores[v] !== undefined && scores[v] !== null && scores[v] !== ""
+  );
+  if (filledVars.length === 0) return null;
+
+  const safeEval = (expr) => {
+    try {
+      const cleanExpr = expr.replace(/[^0-9+\-*/().\s]/g, "");
+      const fn = new Function(`return (${cleanExpr});`);
+      const val = fn();
+      return typeof val === "number" && !isNaN(val) && isFinite(val) ? val : null;
+    } catch {
+      return null;
+    }
+  };
+
+  let actualExpr = formula;
+  vars.forEach((v) => {
+    const val =
+      scores[v] !== undefined && scores[v] !== null && scores[v] !== ""
+        ? Number(scores[v])
+        : 0;
+    actualExpr = actualExpr.replace(new RegExp(`\\b${v}\\b`, "gi"), val);
+  });
+  const actualVal = safeEval(actualExpr);
+
+  let maxExpr = formula;
+  vars.forEach((v) => {
+    const val =
+      scores[v] !== undefined && scores[v] !== null && scores[v] !== ""
+        ? 20
+        : 0;
+    maxExpr = maxExpr.replace(new RegExp(`\\b${v}\\b`, "gi"), val);
+  });
+  const maxVal = safeEval(maxExpr);
+
+  if (actualVal === null || maxVal === null || maxVal === 0) {
+    const vals = filledVars.map((v) => Number(scores[v])).filter((v) => !isNaN(v));
+    if (vals.length === 0) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
+
+  return (actualVal / maxVal) * 20;
 }
 
 /**
@@ -127,7 +177,7 @@ async function checkAndAwardBadges(user) {
         }
       });
       if (Object.keys(scores).length > 0) {
-        const avg = evaluateFormula(scores);
+        const avg = evaluateFormula(subj.formula, scores);
         if (avg !== null && avg >= subj.targetAverage) {
           targetHit = true;
           break;
