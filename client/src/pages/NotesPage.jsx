@@ -5,6 +5,7 @@ import {
   TrendingUp,
   AlertCircle,
   CheckCircle,
+  Edit2,
 } from "lucide-react";
 import useStore from "../store/useStore";
 import api from "../utils/api";
@@ -20,6 +21,7 @@ export default function NotesPage() {
   const [loadingFeedback, setLoadingFeedback] = useState({});
   const [bilan, setBilan] = useState("");
   const [loadingBilan, setLoadingBilan] = useState(false);
+  const [editingTarget, setEditingTarget] = useState(null);
 
   const semester =
     semesters.find((s) => s._id === selectedSemId) || semesters[0];
@@ -101,6 +103,28 @@ export default function NotesPage() {
       }
     } catch (err) {
       toast.error("Erreur mise à jour");
+    }
+  };
+
+  const handleUpdateTargetAverage = async (subjectIndex, newTarget) => {
+    const targetNum = parseFloat(newTarget);
+    if (isNaN(targetNum) || targetNum < 0 || targetNum > 20) return;
+
+    try {
+      const newSubjects = [...semester.subjects];
+      newSubjects[subjectIndex] = {
+        ...newSubjects[subjectIndex],
+        targetAverage: targetNum,
+      };
+
+      const res = await api.put(`/semesters/${semester._id}`, {
+        subjects: newSubjects,
+      });
+      updateSemester(res.data);
+      await checkAndToastNewBadges(user, updateUser);
+      toast.success("Objectif mis à jour ! 🎯");
+    } catch {
+      toast.error("Erreur mise à jour objectif");
     }
   };
 
@@ -216,9 +240,47 @@ export default function NotesPage() {
                 >
                   {avg !== null ? avg.toFixed(2) : "—"}
                 </p>
-                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-                  obj. {subject.targetAverage}/20
-                </p>
+                {editingTarget === subIdx ? (
+                  <div className="flex items-center gap-1 mt-0.5 justify-end">
+                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>obj.</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={20}
+                      step={0.5}
+                      className="input text-xs w-12 text-center py-0 px-1 font-bold h-6"
+                      defaultValue={subject.targetAverage}
+                      autoFocus
+                      onBlur={(e) => {
+                        setEditingTarget(null);
+                        const val = parseFloat(e.target.value);
+                        if (!isNaN(val) && val >= 0 && val <= 20) {
+                          if (val !== subject.targetAverage) {
+                            handleUpdateTargetAverage(subIdx, e.target.value);
+                          }
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.target.blur();
+                        } else if (e.key === "Escape") {
+                          setEditingTarget(null);
+                        }
+                      }}
+                    />
+                    <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>/20</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setEditingTarget(subIdx)}
+                    className="text-xs mt-0.5 hover:underline flex items-center gap-1 justify-end ml-auto group"
+                    style={{ color: "var(--text-muted)" }}
+                    title="Modifier l'objectif"
+                  >
+                    <span>obj. {subject.targetAverage}/20</span>
+                    <Edit2 size={10} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                )}
               </div>
             </div>
 
