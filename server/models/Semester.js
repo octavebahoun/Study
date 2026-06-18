@@ -33,4 +33,16 @@ const semesterSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+semesterSchema.pre('save', function (next) {
+  if (this.subjects && this.subjects.length > 0) {
+    const allFilled = this.subjects.every(subj => 
+      subj.controls.length > 0 && subj.controls.every(ctrl => ctrl.score !== null && ctrl.score !== undefined)
+    );
+    this.isCompleted = allFilled;
+  } else {
+    this.isCompleted = false;
+  }
+  next();
+});
+
 module.exports = mongoose.model('Semester', semesterSchema);

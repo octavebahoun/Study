@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const Semester = require('../models/Semester');
+const { checkAndAwardBadges } = require('../utils/badges');
+
 
 // GET all semesters for user
 router.get('/', auth, async (req, res) => {
@@ -31,12 +33,15 @@ router.post('/', auth, async (req, res) => {
 // PUT update semester
 router.put('/:id', auth, async (req, res) => {
   try {
-    const sem = await Semester.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user._id },
-      req.body,
-      { new: true }
-    );
+    const sem = await Semester.findOne({ _id: req.params.id, userId: req.user._id });
     if (!sem) return res.status(404).json({ error: 'Semestre introuvable' });
+    
+    Object.assign(sem, req.body);
+    await sem.save();
+
+    // Check for badges
+    await checkAndAwardBadges(req.user);
+
     res.json(sem);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -67,6 +72,10 @@ router.put('/:semId/subjects/:subjectIndex/controls/:controlIndex', auth, async 
     if (!sem) return res.status(404).json({ error: 'Semestre introuvable' });
     sem.subjects[req.params.subjectIndex].controls[req.params.controlIndex].score = req.body.score;
     await sem.save();
+
+    // Check for badges
+    await checkAndAwardBadges(req.user);
+
     res.json(sem);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });
