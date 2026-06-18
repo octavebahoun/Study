@@ -15,7 +15,7 @@ import useStore from "../../store/useStore";
 import api from "../../utils/api";
 
 const tabs = [
-  { path: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { path: "/notes", icon: BookOpen, label: "Notes" },
   { path: "/matieres", icon: Library, label: "Matières" },
   { path: "/revisions", icon: Brain, label: "Révisions" },
@@ -92,8 +92,8 @@ export default function MainLayout() {
         <div className="max-w-xl mx-auto px-2 py-1.5 flex items-center justify-around">
           {tabs.map(({ path, icon: Icon, label }) => {
             const isActive =
-              path === "/"
-                ? location.pathname === "/"
+              path === "/dashboard"
+                ? location.pathname === "/dashboard"
                 : location.pathname.startsWith(path);
             return (
               <button

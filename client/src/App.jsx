@@ -13,6 +13,8 @@ import MatieresPage from "./pages/MatieresPage";
 import RevisionsPage from "./pages/RevisionsPage";
 import CalendarPage from "./pages/CalendarPage";
 import ProfilePage from "./pages/ProfilePage";
+import LandingPage from "./pages/LandingPage";
+import PrivacyPage from "./pages/PrivacyPage";
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, user } = useStore();
@@ -24,7 +26,7 @@ function ProtectedRoute({ children }) {
 function AuthRoute({ children }) {
   const { isAuthenticated, user } = useStore();
   if (isAuthenticated && user?.onboardingCompleted)
-    return <Navigate to="/" replace />;
+    return <Navigate to="/dashboard" replace />;
   return children;
 }
 
@@ -55,6 +57,11 @@ export default function App() {
         }}
       />
       <Routes>
+        {/* Routes Publiques */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+
+        {/* Routes d'authentification */}
         <Route
           path="/login"
           element={
@@ -72,22 +79,23 @@ export default function App() {
           }
         />
         <Route path="/onboarding" element={<OnboardingPage />} />
+
+        {/* Routes de l'application (Protégées) */}
         <Route
-          path="/"
           element={
             <ProtectedRoute>
               <MainLayout />
             </ProtectedRoute>
           }
         >
-          <Route index element={<DashboardPage />} />
-          <Route path="notes" element={<NotesPage />} />
-          <Route path="matieres" element={<MatieresPage />} />
-          <Route path="revisions" element={<RevisionsPage />} />
-          <Route path="calendar" element={<CalendarPage />} />
-          <Route path="profile" element={<ProfilePage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/notes" element={<NotesPage />} />
+          <Route path="/matieres" element={<MatieresPage />} />
+          <Route path="/revisions" element={<RevisionsPage />} />
+          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
-        <Route path="*" element={<Navigate to="profile" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );

@@ -136,7 +136,7 @@ export default function OnboardingPage() {
       }
       setSemesters(createdSems);
       toast.success("Configuration terminée ! 🎉");
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.error || "Erreur configuration");
     } finally {

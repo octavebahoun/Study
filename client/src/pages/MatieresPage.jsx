@@ -16,9 +16,10 @@ import {
 import useStore from "../store/useStore";
 import api from "../utils/api";
 import toast from "react-hot-toast";
+import { checkAndToastNewBadges } from "../utils/badgeSync";
 
 export default function MatieresPage() {
-  const { semesters, user, updateSemester } = useStore();
+  const { semesters, user, updateSemester, updateUser } = useStore();
   const [selectedSemId, setSelectedSemId] = useState("");
   const [expanded, setExpanded] = useState({});
   const [notionInputs, setNotionInputs] = useState({});
@@ -28,6 +29,7 @@ export default function MatieresPage() {
   const [subjectForm, setSubjectForm] = useState({
     name: "",
     coefficient: 1,
+    formula: "",
     targetAverage: 10,
   });
   const [uploading, setUploading] = useState({});
@@ -62,6 +64,7 @@ export default function MatieresPage() {
         subjects: newSubjects,
       });
       updateSemester(res.data);
+      await checkAndToastNewBadges(user, updateUser);
       setIsAddingSubject(false);
       setSubjectForm({
         name: "",
@@ -83,6 +86,7 @@ export default function MatieresPage() {
         subjects: newSubjects,
       });
       updateSemester(res.data);
+      await checkAndToastNewBadges(user, updateUser);
       setEditingSubject(null);
       toast.success("Matière mise à jour !");
     } catch {
@@ -98,6 +102,7 @@ export default function MatieresPage() {
         subjects: newSubjects,
       });
       updateSemester(res.data);
+      await checkAndToastNewBadges(user, updateUser);
       toast.success("Matière supprimée");
     } catch {
       toast.error("Erreur");
@@ -253,7 +258,7 @@ export default function MatieresPage() {
                 onChange={(e) =>
                   setSubjectForm({
                     ...subjectForm,
-                    coefficient: parseFloat(e.target.value),
+                    coefficient: parseFloat(e.target.value) || 0,
                   })
                 }
               />
@@ -267,7 +272,21 @@ export default function MatieresPage() {
                 onChange={(e) =>
                   setSubjectForm({
                     ...subjectForm,
-                    targetAverage: parseFloat(e.target.value),
+                    targetAverage: parseFloat(e.target.value) || 0,
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="label">Formule de calcul</label>
+              <input
+                className="input"
+                placeholder="Ex: (i1 + i2) * 0.3 + d1 * 0.7"
+                value={subjectForm.formula}
+                onChange={(e) =>
+                  setSubjectForm({
+                    ...subjectForm,
+                    formula: e.target.value,
                   })
                 }
               />
@@ -305,12 +324,19 @@ export default function MatieresPage() {
                     <p className="text-sm font-bold">
                       {subject.name.replace(/&amp;/g, "&")}
                     </p>
-                    <p
-                      className="text-[10px] leading-tight"
+                     <p
+                      className="text-[10px] leading-tight flex flex-wrap items-center gap-1 mt-0.5"
                       style={{ color: "var(--text-muted)" }}
                     >
-                      Coeff. {subject.coefficient} · {notionCount} notion
-                      {notionCount > 1 ? "s" : ""}
+                      <span>Coeff. {subject.coefficient}</span>
+                      <span>·</span>
+                      <span className="font-mono bg-slate-100 dark:bg-slate-800/80 px-1 py-0.5 rounded text-[9px] text-indigo-600 dark:text-indigo-400">
+                        {subject.formula}
+                      </span>
+                      <span>·</span>
+                      <span>
+                        {notionCount} notion{notionCount > 1 ? "s" : ""}
+                      </span>
                     </p>
                   </div>
                 </div>
@@ -322,6 +348,7 @@ export default function MatieresPage() {
                       setSubjectForm({
                         name: subject.name,
                         coefficient: subject.coefficient,
+                        formula: subject.formula || "",
                         targetAverage: subject.targetAverage,
                       });
                     }}
@@ -370,7 +397,7 @@ export default function MatieresPage() {
                           onChange={(e) =>
                             setSubjectForm({
                               ...subjectForm,
-                              coefficient: parseFloat(e.target.value),
+                              coefficient: parseFloat(e.target.value) || 0,
                             })
                           }
                         />
@@ -384,11 +411,25 @@ export default function MatieresPage() {
                           onChange={(e) =>
                             setSubjectForm({
                               ...subjectForm,
-                              targetAverage: parseFloat(e.target.value),
+                              targetAverage: parseFloat(e.target.value) || 0,
                             })
                           }
                         />
                       </div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="label text-[10px]">Formule de calcul</label>
+                      <input
+                        className="input text-sm"
+                        placeholder="Ex: (i1 + i2) * 0.3 + d1 * 0.7"
+                        value={subjectForm.formula}
+                        onChange={(e) =>
+                          setSubjectForm({
+                            ...subjectForm,
+                            formula: e.target.value,
+                          })
+                        }
+                      />
                     </div>
                   </div>
                   <div className="flex gap-2">

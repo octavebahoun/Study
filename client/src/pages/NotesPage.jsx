@@ -8,15 +8,13 @@ import {
 } from "lucide-react";
 import useStore from "../store/useStore";
 import api from "../utils/api";
-import {
-  evaluateFormula,
-  calculateRequired,
-  extractVariables,
-} from "../utils/gradeCalc";
+import { evaluateFormula, calculateRequired, extractVariables } from "../utils/gradeCalc";
 import toast from "react-hot-toast";
+import { checkAndToastNewBadges } from "../utils/badgeSync";
+
 
 export default function NotesPage() {
-  const { semesters, user, updateSemester } = useStore();
+  const { semesters, user, updateSemester, updateUser } = useStore();
   const [selectedSemId, setSelectedSemId] = useState("");
   const [aiFeedbacks, setAiFeedbacks] = useState({});
   const [loadingFeedback, setLoadingFeedback] = useState({});
@@ -66,8 +64,11 @@ export default function NotesPage() {
     controlIndex,
     score,
   ) => {
-    const scoreNum = parseFloat(score);
-    if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 20) return;
+    let scoreNum = null;
+    if (score !== null && score !== "") {
+      scoreNum = parseFloat(score);
+      if (isNaN(scoreNum) || scoreNum < 0 || scoreNum > 20) return;
+    }
 
     try {
       const res = await api.put(
@@ -76,15 +77,20 @@ export default function NotesPage() {
       );
       updateSemester(res.data);
 
-      // Trigger AI feedback
-      const subject = res.data.subjects[subjectIndex];
-      const avg = computeAverage(subject);
-      const req = computeRequired(subject);
-      const missingCount = subject.controls.filter(
-        (c) => c.score === null,
-      ).length;
+      // Trigger badge check & update user in store
+      await checkAndToastNewBadges(user, updateUser);
 
-      fetchAIFeedback(subject, scoreNum, avg, req, missingCount, subjectIndex);
+      if (scoreNum !== null) {
+        // Trigger AI feedback
+        const subject = res.data.subjects[subjectIndex];
+        const avg = computeAverage(subject);
+        const req = computeRequired(subject);
+        const missingCount = subject.controls.filter(
+          (c) => c.score === null,
+        ).length;
+
+        fetchAIFeedback(subject, scoreNum, avg, req, missingCount, subjectIndex);
+      }
 
       // Check if semester complete for bilan
       const allFilled = res.data.subjects.every((s) =>
@@ -248,6 +254,7 @@ export default function NotesPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <input
+                      key={`${ctrlIdx}-${ctrl.score ?? "null"}`}
                       type="number"
                       min={0}
                       max={20}
@@ -256,13 +263,26 @@ export default function NotesPage() {
                       placeholder="—"
                       defaultValue={ctrl.score ?? ""}
                       onBlur={(e) => {
-                        if (e.target.value !== "")
-                          handleScoreUpdate(
-                            semester._id,
-                            subIdx,
-                            ctrlIdx,
-                            e.target.value,
-                          );
+                        const val = e.target.value;
+                        if (val === "") {
+                          if (ctrl.score !== null) {
+                            handleScoreUpdate(semester._id, subIdx, ctrlIdx, null);
+                          }
+                        } else {
+                          const num = parseFloat(val);
+                          if (!isNaN(num) && num >= 0 && num <= 20) {
+                            if (num !== ctrl.score) {
+                              handleScoreUpdate(semester._id, subIdx, ctrlIdx, num);
+                            }
+                          } else {
+                            e.target.value = ctrl.score ?? "";
+                          }
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.target.blur();
+                        }
                       }}
                     />
                     <span

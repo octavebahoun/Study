@@ -18,7 +18,7 @@ export default function LoginPage() {
     try {
       const res = await api.post("/auth/login", form);
       setAuth(res.data.user, res.data.token);
-      navigate(res.data.user.onboardingCompleted ? "/" : "/onboarding");
+      navigate(res.data.user.onboardingCompleted ? "/dashboard" : "/onboarding");
     } catch (err) {
       const errorMessage =
         typeof err.response?.data?.error === "string"
